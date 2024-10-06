@@ -2,6 +2,7 @@ import csv
 from io import StringIO
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime #für Datum und Zeit
 
 # Wichtige Datei Pfade und Namen als Variablen
 form_file = 'form.html'
@@ -25,6 +26,7 @@ class Entry(db.Model):
     age = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String(100), nullable=False)
     Platz10 = db.Column(db.String(100), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Feld für Datum und Zeit
 
 # Route zum Anzeigen des Formulars
 @app.route('/')
