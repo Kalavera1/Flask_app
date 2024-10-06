@@ -11,8 +11,10 @@
         <h1 class="text-center">Antworten</h1>
         <table class="table table-striped mt-4">
             <thead>
-                <tr>
+                <tr> <!-- DEFINIERT SPALTENNAMEN -->
                     <th>ID</th>
+                    <th>Datum</th>
+                    <th>TimeStamp</th>
                     <th>Name</th>
                     <th>Alter</th>
                     <th>Email</th>
@@ -21,8 +23,10 @@
             </thead>
             <tbody>
                 {% for entry in entries %}
-                <tr>
+                <tr> <!-- DEFINIERT WAS ANGEZEIGT WIRD UND IN WELCHER REIHENFOLGE -->
                     <td>{{ entry.id }}</td>
+                    <td>{{ entry.created_at.strftime('%d.%m.%Y') }}</td> <!-- Datum und Zeit formatieren -->
+                    <td>{{ entry.created_at.strftime('%H:%M') }}</td> <!-- Datum und Zeit formatieren -->
                     <td>{{ entry.name }}</td>
                     <td>{{ entry.age }}</td>
                     <td>{{ entry.email }}</td>

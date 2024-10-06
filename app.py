@@ -7,8 +7,12 @@ from datetime import datetime #für Datum und Zeit
 # Wichtige Datei Pfade und Namen als Variablen
 form_file = 'form.html'
 
+####---- Der Folgende Teil startet Flask ----
 app = Flask(__name__)
 
+########
+## ---- DATENBANK
+########
 # Für die FLASK SQL Datenbank
 app.secret_key = 'supersecretkey'  # Für Flash-Nachrichten erforderlich
 
