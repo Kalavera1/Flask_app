@@ -85,9 +85,8 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="text-center">Goldener Berti</h1>
-
-                <!-- Flash Messages -->
+        <h1 class="text-center">Goldener Berti 2024</h1>
+        <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div class="alert alert-dismissible fade show" role="alert">
@@ -102,27 +101,64 @@
         {% endwith %}
 
         <form action="/submit" method="POST" class="mt-4">
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="Gib deinen Namen ein">
-            </div>
-            <div class="mb-3">
-                <label for="age" class="form-label">Alter</label>
-                <input type="number" class="form-control" id="age" name="age" placeholder="Gib dein Alter ein">
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">E-Mail</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Geben Sie eine email-adresse an">
-            </div>
-
             <div class="mb-3 position-relative">
                 <label for="Platz10" class="form-label">Platz 10</label>
                 <input type="text" class="form-control" id="Platz10" name="Platz10" placeholder="Gib ein Brettspiel ein">
                 <div id="suggestions" class="list-group mt-2"></div>
             </div>
 
+            <div class="mb-3 position-relative">
+                <label for="Platz9" class="form-label">Platz 9</label>
+                <input type="text" class="form-control" id="Platz9" name="Platz9" placeholder="Gib ein Brettspiel ein">
+                <div id="suggestions" class="list-group mt-2"></div>
+            </div>
+
+            <div class="mb-3 position-relative">
+                <label for="Platz8" class="form-label">Platz 8</label>
+                <input type="text" class="form-control" id="Platz8" name="Platz8" placeholder="Gib ein Brettspiel ein">
+                <div id="suggestions" class="list-group mt-2"></div>
+            </div>
+
+            <div class="mb-3 position-relative">
+                <label for="Platz7" class="form-label">Platz 7</label>
+                <input type="text" class="form-control" id="Platz7" name="Platz7" placeholder="Gib ein Brettspiel ein">
+                <div id="suggestions" class="list-group mt-2"></div>
+            </div>
+
+            <div class="mb-3 position-relative">
+                <label for="Platz6" class="form-label">Platz 6</label>
+                <input type="text" class="form-control" id="Platz6" name="Platz6" placeholder="Gib ein Brettspiel ein">
+                <div id="suggestions" class="list-group mt-2"></div>
+            </div>
+
+            <div class="mb-3 position-relative">
+                <label for="Platz5" class="form-label">Platz 5</label>
+                <input type="text" class="form-control" id="Platz5" name="Platz5" placeholder="Gib ein Brettspiel ein">
+                <div id="suggestions" class="list-group mt-2"></div>
+            </div>
+            <div class="mb-3 position-relative">
+                <label for="Platz4" class="form-label">Platz 4</label>
+                <input type="text" class="form-control" id="Platz4" name="Platz4" placeholder="Gib ein Brettspiel ein">
+                <div id="suggestions" class="list-group mt-2"></div>
+            </div>
+            <div class="mb-3 position-relative">
+                <label for="Platz3" class="form-label">Platz 3</label>
+                <input type="text" class="form-control" id="Platz3" name="Platz3" placeholder="Gib ein Brettspiel ein">
+                <div id="suggestions" class="list-group mt-2"></div>
+            </div>
+            <div class="mb-3 position-relative">
+                <label for="Platz2" class="form-label">Platz 2</label>
+                <input type="text" class="form-control" id="Platz2" name="Platz2" placeholder="Gib ein Brettspiel ein">
+                <div id="suggestions" class="list-group mt-2"></div>
+            </div>
+            <div class="mb-3 position-relative">
+                <label for="Platz1" class="form-label">Platz 1</label>
+                <input type="text" class="form-control" id="Platz1" name="Platz1" placeholder="Gib ein Brettspiel ein">
+                <div id="suggestions" class="list-group mt-2"></div>
+            </div>
+
             <button type="submit" class="btn btn-primary">
-                 <i class="fas fa-paper-plane"></i> Abschicken
+                 <i class="fas fa-paper-plane"></i> Speichern und Abschicken
             </button>
 
         </form>
