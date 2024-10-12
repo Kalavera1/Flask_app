@@ -9,11 +9,20 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length
 from email_validator import validate_email
 from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_mail import Mail, Message
 
-# Wichtige Datei Pfade und Namen als Variablen
-form_file = 'form.html'
-
+# Erstelle die Flask App-Instanz
 app = Flask(__name__)
+
+# Mail-Konfiguration
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'your_email@gmail.com'
+app.config['MAIL_PASSWORD'] = 'your_email_password'
+
+mail = Mail(app)
+
 # Für die FLASK SQL Datenbank
 app.secret_key = 'supersecretkey'  # Für Flash-Nachrichten erforderlich
 # Datenbank-Konfiguration
@@ -93,7 +102,6 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            #flash("Login erfolgreich!")
             return redirect(url_for('form'))
         else:
             flash("Login fehlgeschlagen. Bitte überprüfe deine Email und dein Passwort.")
@@ -104,7 +112,6 @@ def login():
 @login_required
 def logout():
     logout_user()
-    #flash("Du wurdest abgemeldet.")
     return redirect(url_for('login'))
 
 # Route für das Eintragsformular, nur für angemeldete Benutzer
@@ -125,6 +132,8 @@ def form():
         Platz3 = request.form.get('Platz3')
         Platz2 = request.form.get('Platz2')
         Platz1 = request.form.get('Platz1')
+
+
 
         # Validierung: Überprüfe, ob alle Felder ausgefüllt sind
         if not Platz10 or not Platz9 or not Platz8 or not Platz7 or not Platz6 or not Platz5 or not Platz4 or not Platz3 or not Platz2 or not Platz1:
@@ -155,10 +164,46 @@ def form():
                 Platz1=Platz1
             )
             db.session.add(new_entry)
-
         db.session.commit()
+
+        #Überprüfen, ob die Checkbox aktiviert ist
+        send_email = request.form.get('sendEmail')  # Gibt 'on' zurück, wenn die Checkbox ausgewählt wurde
+
+        #MAIL formatierung
+        if send_email:
+            subject = "Bestätigung: Teilnahme am Goldenen Berti 2024"
+            body = f"""
+            Hallo {name},
+
+            Vielen Dank für deine Teilnahme am Goldenen Berti 2024!
+
+            Hier sind deine Platzierungen der Brettspiele:
+
+            Platz 10: {Platz10}
+            Platz 9: {Platz9}
+            Platz 8: {Platz8}
+            Platz 7: {Platz7}
+            Platz 6: {Platz6}
+            Platz 5: {Platz5}
+            Platz 4: {Platz4}
+            Platz 3: {Platz3}
+            Platz 2: {Platz2}
+            Platz 1: {Platz1}
+
+            Du kannst deine Eingaben jederzeit ändern, indem du dich wieder anmeldest: http://localhost:5000/login
+
+            Mit freundlichen Grüßen,
+            Das Team vom Goldenen Berti
+            """
+
+            msg = Message(subject, recipients=[email])
+            msg.body = body
+            mail.send(msg)
+
         flash("Eintrag gespeichert.")
-        return redirect(url_for('form'))
+        return redirect(url_for('thankyou'))
+        #return redirect(url_for('form'))
+
 
     # Wenn der Benutzer bereits einen Eintrag hat, wird dieser angezeigt
     return render_template('form.html', entry=existing_entry)
@@ -176,43 +221,41 @@ def autocomplete():
     if not query:
         return jsonify([])
 
-    #Überprüfen, ob das Brettspiel dictionary vorhanden ist oder nicht.
     try:
         with open('static/brettspiele.txt', 'r', encoding='utf-8') as f:
             brettspiele = [line.strip() for line in f.readlines()]
     except FileNotFoundError:
-        return jsonify([])  # Leere Liste zurückgeben, falls Datei nicht gefunden wird
+        return jsonify([])
 
-    # Vorschläge filtern
     matches = [spiel for spiel in brettspiele if query.lower() in spiel.lower()]
 
-    return jsonify(matches[:10])  # Nur die ersten 5 Vorschläge zurückgeben
+    return jsonify(matches[:10])
+
+# Route zur Bestätigungsseite
+@app.route('/thankyou')
+@login_required
+def thankyou():
+    return render_template('thankyou.html')
 
 @app.route('/export')
 def export_csv():
-    # Abfrage aller Einträge in der Datenbank
     all_entries = Entry.query.all()
 
-    # StringIO-Objekt, um die CSV-Datei in den Speicher zu schreiben
     si = StringIO()
     cw = csv.writer(si)
 
-    # CSV-Header
     cw.writerow(['ID', 'Email', 'Brettspiel Platz 10'])
 
-    # CSV-Inhalt (Einträge)
     for entry in all_entries:
         cw.writerow([entry.id, entry.email, entry.Platz10])
 
-    # Die CSV-Datei zum Download bereitstellen
     output = si.getvalue()
     si.close()
 
-    # Flask Response zur Rückgabe der CSV-Datei
     return Response(output, mimetype="text/csv", headers={"Content-Disposition": "attachment;filename=entries.csv"})
 
 # Datenbank erstellen und die Anwendung starten
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Erstellt die Datenbank und Tabellen, falls sie nicht existieren
+        db.create_all()
     app.run(debug=True)

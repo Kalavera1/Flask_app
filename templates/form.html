@@ -131,20 +131,6 @@
     <div class="container mt-5">
         <h1 class="text-center">Goldener Berti 2024</h1>
 
-        <!-- Flash Messages -->
-         {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-                <div id="flash-message" class="alert alert-success alert-dismissible fade show" role="alert">
-                  {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                      {{ message }}
-                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                  {% endfor %}
-                </div>
-              {% endif %}
-         {% endwith %}
-
         <form action="{{ url_for('form') }}" method="POST">
             {% for platz in range(10, 0, -1) %}
             <div class="mb-3 position-relative">
@@ -158,6 +144,25 @@
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" value="{{ entry.email if entry else '' }}" required>
             </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="sendEmail" name="sendEmail">
+                <label class="form-check-label" for="sendEmail">Ich möchte eine Bestätigungs-E-Mail mit meinen Eingaben erhalten</label>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                   <div id="flash-message" class="alert alert-success alert-dismissible fade show" role="alert">
+                     {% for category, message in messages %}
+                       <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                         {{ message }}
+                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                       </div>
+                     {% endfor %}
+                   </div>
+                 {% endif %}
+            {% endwith %}
 
             <div class="btn-container">
                 <button type="submit" class="btn-gold">
@@ -237,6 +242,17 @@
             alert("Bitte wähle für jeden Platz ein einzigartiges Brettspiel aus. Doppelte Einträge sind nicht erlaubt!");
         }
     });
+    // Funktion, um die Flash-Nachricht nach 5 Sekunden zu entfernen
+    setTimeout(function() {
+        let flashMessage = document.getElementById('flash-message');
+        if (flashMessage) {
+            flashMessage.style.transition = "opacity 1s ease-out";
+            flashMessage.style.opacity = "0";
+            setTimeout(function() {
+                flashMessage.remove();
+            }, 1000);  // Entfernen nach der Animation
+        }
+    }, 1000);  // 1.0 Sekunde warten
 </script>
 
 </body>
