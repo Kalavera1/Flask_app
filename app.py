@@ -37,7 +37,6 @@ class User(UserMixin, db.Model):
 class Entry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False)
     Platz10 = db.Column(db.String(100), nullable=True)
     Platz9 = db.Column(db.String(100), nullable=True)
@@ -94,7 +93,7 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash("Login erfolgreich!")
+            #flash("Login erfolgreich!")
             return redirect(url_for('form'))
         else:
             flash("Login fehlgeschlagen. Bitte überprüfe deine Email und dein Passwort.")
@@ -105,7 +104,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash("Du wurdest abgemeldet.")
+    #flash("Du wurdest abgemeldet.")
     return redirect(url_for('login'))
 
 # Route für das Eintragsformular, nur für angemeldete Benutzer
@@ -114,7 +113,7 @@ def logout():
 def form():
     existing_entry = Entry.query.filter_by(user_id=current_user.id).first()
     if request.method == 'POST':
-        name = request.form.get('name')
+        # Daten aus dem Formular abfragen und speichern
         email = request.form.get('email')
         Platz10 = request.form.get('Platz10')
         Platz9 = request.form.get('Platz9')
@@ -127,9 +126,13 @@ def form():
         Platz2 = request.form.get('Platz2')
         Platz1 = request.form.get('Platz1')
 
+        # Validierung: Überprüfe, ob alle Felder ausgefüllt sind
+        if not Platz10 or not Platz9 or not Platz8 or not Platz7 or not Platz6 or not Platz5 or not Platz4 or not Platz3 or not Platz2 or not Platz1:
+            flash("Alle Felder müssen ausgefüllt sein!", "error")
+            return redirect(url_for('form'))
+
         # Wenn der Benutzer bereits einen Eintrag hat, diesen aktualisieren
         if existing_entry:
-            existing_entry.name = name
             existing_entry.email = email
             existing_entry.Platz10 = Platz10
             existing_entry.Platz9 = Platz9
@@ -141,15 +144,23 @@ def form():
             existing_entry.Platz3 = Platz3
             existing_entry.Platz2 = Platz2
             existing_entry.Platz1 = Platz1
+
         else:
             # Neuer Eintrag, falls noch keiner existiert
-            new_entry = Entry(user_id=current_user.id, name=name, email=email, Platz10=Platz10, Platz9=Platz9, Platz8=Platz8, Platz7=Platz7, Platz6=Platz6, Platz5=Platz5, Platz4=Platz4, Platz3=Platz3, Platz2=Platz2, Platz1=Platz1)
+            new_entry = Entry(
+                user_id=current_user.id, email=email,
+                Platz10=Platz10, Platz9=Platz9, Platz8=Platz8,
+                Platz7=Platz7, Platz6=Platz6, Platz5=Platz5,
+                Platz4=Platz4, Platz3=Platz3, Platz2=Platz2,
+                Platz1=Platz1
+            )
             db.session.add(new_entry)
 
         db.session.commit()
         flash("Eintrag gespeichert.")
         return redirect(url_for('form'))
 
+    # Wenn der Benutzer bereits einen Eintrag hat, wird dieser angezeigt
     return render_template('form.html', entry=existing_entry)
 
 # Route zum Anzeigen aller Einträge (optional, nur für Admins)
@@ -187,11 +198,11 @@ def export_csv():
     cw = csv.writer(si)
 
     # CSV-Header
-    cw.writerow(['ID', 'Name', 'Alter', 'Email', 'Brettspiel Platz 10'])
+    cw.writerow(['ID', 'Email', 'Brettspiel Platz 10'])
 
     # CSV-Inhalt (Einträge)
     for entry in all_entries:
-        cw.writerow([entry.id, entry.name, entry.age, entry.email, entry.Platz10])
+        cw.writerow([entry.id, entry.email, entry.Platz10])
 
     # Die CSV-Datei zum Download bereitstellen
     output = si.getvalue()
@@ -199,51 +210,6 @@ def export_csv():
 
     # Flask Response zur Rückgabe der CSV-Datei
     return Response(output, mimetype="text/csv", headers={"Content-Disposition": "attachment;filename=entries.csv"})
-
-
-# Route zum Verarbeiten des Formulars, wenn es abgeschickt wird per POST
-@app.route('/submit', methods=['POST'])
-def submit():
-    name = request.form.get('name')
-    age = request.form.get('age')
-    email = request.form.get('email')
-    Platz10 = request.form.get('Platz10')
-
-    # Validierung der Eingaben
-    if not name:
-        flash("Der Name darf nicht leer sein!", "error")
-        return redirect(url_for('form'))
-
-    if not age.isdigit() or int(age) <= 0:
-        flash("Bitte gib ein gültiges Alter ein!", "error")
-        return redirect(url_for('form'))
-
-    if not email:
-        flash("Bitte geben Sie eine gültige E-Mail ein!", "error")
-        return redirect(url_for('form'))
-
-    # Prüfen, ob das Brettspiel für Platz 10 in der Textdatei existiert
-    try:
-        with open('static/brettspiele.txt', 'r', encoding='utf-8') as f:
-            brettspiele = [line.strip() for line in f.readlines()]
-    except FileNotFoundError:
-        flash("Die Liste der Brettspiele konnte nicht geladen werden.", "error")
-        return redirect(url_for('form'))
-
-    if Platz10 not in brettspiele:
-        flash("Bitte wähle ein Brettspiel aus der Liste für Platz 10!", "error")
-        return redirect(url_for('form'))
-
-    # Neue Benutzerdaten speichern
-    new_entry = Entry(name=name, age=int(age), email=email, Platz10=Platz10)
-    db.session.add(new_entry)
-    db.session.commit()
-
-    # Erfolgsmeldung
-    flash(f"Neuer Eintrag für {name} mit dem Brettspiel: {Platz10} wurde erfolgreich hinzugefügt!", "success")
-    return redirect(url_for('form'))
-
-
 
 # Datenbank erstellen und die Anwendung starten
 if __name__ == '__main__':

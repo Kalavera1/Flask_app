@@ -15,8 +15,6 @@
                     <th>ID</th>
                     <th>Datum</th>
                     <th>TimeStamp</th>
-                    <th>Name</th>
-                    <th>Alter</th>
                     <th>Email</th>
                     <th>Platz 10</th>
                 </tr>
@@ -27,8 +25,6 @@
                     <td>{{ entry.id }}</td>
                     <td>{{ entry.created_at.strftime('%d.%m.%Y') }}</td> <!-- Datum und Zeit formatieren -->
                     <td>{{ entry.created_at.strftime('%H:%M') }}</td> <!-- Datum und Zeit formatieren -->
-                    <td>{{ entry.name }}</td>
-                    <td>{{ entry.age }}</td>
                     <td>{{ entry.email }}</td>
                     <td>{{ entry.Platz10 }}</td>
                 </tr>

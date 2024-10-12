@@ -6,64 +6,101 @@
     <title>Der Goldene Berti - Abstimmungsformular</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts (Optional) -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <!-- icons -->
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-    body {
-        background-image: url("/static/background_dashboard.png");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        color: #f5f5f5; /* Helle Schriftfarbe */
-        font-family: 'Roboto', sans-serif;
-    }
-
+        body {
+            background-image: url("/static/background_dashboard.png");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #f5f5f5;
+            font-family: 'Roboto', sans-serif;
+        }
 
         h1 {
             color: #ffffff;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 48px;
+            margin-bottom: 30px;
         }
 
         label {
             color: #ffffff;
+            font-weight: 500;
+            font-size: 18px;
+            margin-bottom: 8px;
         }
 
         .form-control {
             background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-            color: #000;
+            border-radius: 15px;
+            border: 2px solid #ddd;
+            padding: 12px 15px;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #333;
+            transition: all 0.3s ease;
         }
 
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            border-radius: 30px;
-            padding: 10px 20px;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        .form-control:focus {
+            border-color: #FFD700;
+            box-shadow: 0 6px 12px rgba(255, 215, 0, 0.5);
+            outline: none;
+            transform: scale(1.02);
         }
 
-        .btn-primary:hover {
-            background-color: #0056b3;
-            box-shadow: 0px 4px 15px rgba(0, 123, 255, 0.4);
+        .btn-gold {
+            background-color: #FFD700;
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            border: 2px solid #FFD700;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0px 4px 15px rgba(255, 215, 0, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-gold:hover {
+            color: #FFD700;
+            background-color: #fff;
+            box-shadow: 0px 6px 20px rgba(255, 215, 0, 0.7);
+            transform: scale(1.1);
+        }
+
+        .btn-gold::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 300%;
+            height: 400%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%) rotate(45deg);
+            transition: left 0.75s ease;
+            z-index: -1;
+        }
+
+        .btn-gold:hover::before {
+            left: -100%;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
         }
 
         .btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
-            border-radius: 30px;
-            padding: 10px 20px;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .btn-success:hover {
-            background-color: #218838;
-            box-shadow: 0px 4px 15px rgba(40, 167, 69, 0.4);
+            margin-left: 10px;
         }
 
         .list-group-item:hover {
@@ -76,139 +113,128 @@
         }
 
         .container {
-            background-color: rgba(245, 227, 118, 0.3);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, rgba(255, 223, 186, 0.8), rgba(200, 227, 118, 0.3));
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 16px 30px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Goldener Berti 2024</h1>
+
         <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="alert alert-dismissible fade show" role="alert">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+         {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div id="flash-message" class="alert alert-success alert-dismissible fade show" role="alert">
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                      {{ message }}
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+         {% endwith %}
+
+        <form action="{{ url_for('form') }}" method="POST">
+            {% for platz in range(10, 0, -1) %}
+            <div class="mb-3 position-relative">
+                <label for="Platz{{ platz }}" class="form-label">Platz {{ platz }}</label>
+                <input type="text" class="form-control" id="Platz{{ platz }}" name="Platz{{ platz }}" value="{{ entry['Platz' ~ platz] if entry else '' }}" placeholder="Gib ein Brettspiel ein">
+                <div id="suggestions-Platz{{ platz }}" class="list-group"></div>
             </div>
             {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
 
-        <form action="/submit" method="POST" class="mt-4">
-            <div class="mb-3 position-relative">
-                <label for="Platz10" class="form-label">Platz 10</label>
-                <input type="text" class="form-control" id="Platz10" name="Platz10" placeholder="Gib ein Brettspiel ein">
-                <div id="suggestions" class="list-group mt-2"></div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ entry.email if entry else '' }}" required>
             </div>
 
-            <div class="mb-3 position-relative">
-                <label for="Platz9" class="form-label">Platz 9</label>
-                <input type="text" class="form-control" id="Platz9" name="Platz9" placeholder="Gib ein Brettspiel ein">
-                <div id="suggestions" class="list-group mt-2"></div>
+            <div class="btn-container">
+                <button type="submit" class="btn-gold">
+                  <i class="fas fa-paper-plane"></i> Speichern und Abschicken
+                </button>
             </div>
-
-            <div class="mb-3 position-relative">
-                <label for="Platz8" class="form-label">Platz 8</label>
-                <input type="text" class="form-control" id="Platz8" name="Platz8" placeholder="Gib ein Brettspiel ein">
-                <div id="suggestions" class="list-group mt-2"></div>
-            </div>
-
-            <div class="mb-3 position-relative">
-                <label for="Platz7" class="form-label">Platz 7</label>
-                <input type="text" class="form-control" id="Platz7" name="Platz7" placeholder="Gib ein Brettspiel ein">
-                <div id="suggestions" class="list-group mt-2"></div>
-            </div>
-
-            <div class="mb-3 position-relative">
-                <label for="Platz6" class="form-label">Platz 6</label>
-                <input type="text" class="form-control" id="Platz6" name="Platz6" placeholder="Gib ein Brettspiel ein">
-                <div id="suggestions" class="list-group mt-2"></div>
-            </div>
-
-            <div class="mb-3 position-relative">
-                <label for="Platz5" class="form-label">Platz 5</label>
-                <input type="text" class="form-control" id="Platz5" name="Platz5" placeholder="Gib ein Brettspiel ein">
-                <div id="suggestions" class="list-group mt-2"></div>
-            </div>
-            <div class="mb-3 position-relative">
-                <label for="Platz4" class="form-label">Platz 4</label>
-                <input type="text" class="form-control" id="Platz4" name="Platz4" placeholder="Gib ein Brettspiel ein">
-                <div id="suggestions" class="list-group mt-2"></div>
-            </div>
-            <div class="mb-3 position-relative">
-                <label for="Platz3" class="form-label">Platz 3</label>
-                <input type="text" class="form-control" id="Platz3" name="Platz3" placeholder="Gib ein Brettspiel ein">
-                <div id="suggestions" class="list-group mt-2"></div>
-            </div>
-            <div class="mb-3 position-relative">
-                <label for="Platz2" class="form-label">Platz 2</label>
-                <input type="text" class="form-control" id="Platz2" name="Platz2" placeholder="Gib ein Brettspiel ein">
-                <div id="suggestions" class="list-group mt-2"></div>
-            </div>
-            <div class="mb-3 position-relative">
-                <label for="Platz1" class="form-label">Platz 1</label>
-                <input type="text" class="form-control" id="Platz1" name="Platz1" placeholder="Gib ein Brettspiel ein">
-                <div id="suggestions" class="list-group mt-2"></div>
-            </div>
-
-            <button type="submit" class="btn btn-primary">
-                 <i class="fas fa-paper-plane"></i> Speichern und Abschicken
-            </button>
-
         </form>
 
         <div class="mt-4">
             <a href="/export" class="btn btn-success">
                <i class="fas fa-download"></i>
                 Datei export als CSV</a>
-
         </div>
     </div>
 
-    <script>
-    let validSelection = false;  // Variable zur Überprüfung der gültigen Auswahl
-    let currentSuggestions = [];  // Speichert die aktuellen Vorschläge
+<script>
+    let validSelections = {};
+    let currentSuggestions = {};
 
-    document.getElementById('Platz10').addEventListener('input', function() {
-        let query = this.value;
-        validSelection = false;  // Ungültige Auswahl, bis ein Vorschlag geklickt wird
+    const platzIds = Array.from({ length: 10 }, (_, i) => `Platz${10 - i}`);
 
-        if (query.length > 1) {
-            fetch(`/autocomplete?query=${query}`)
-                .then(response => response.json())
-                .then(data => {
-                    currentSuggestions = data;  // Speichert aktuelle Vorschläge
-                    let suggestions = document.getElementById('suggestions');
-                    suggestions.innerHTML = '';
-                    data.forEach(item => {
-                        let option = document.createElement('div');
-                        option.classList.add('list-group-item');
-                        option.textContent = item;
-                        option.onclick = function() {
-                            document.getElementById('Platz10').value = item;
-                            suggestions.innerHTML = '';
-                            validSelection = true;  // Gültige Auswahl wurde getroffen
-                        };
-                        suggestions.appendChild(option);
+    platzIds.forEach(function(platzId) {
+        let inputField = document.getElementById(platzId);
+        let currentValue = inputField.value.trim();
+
+        validSelections[platzId] = currentValue.length > 0;
+        currentSuggestions[platzId] = [];
+
+        inputField.addEventListener('input', function() {
+            let query = this.value.trim();
+            validSelections[platzId] = false;
+
+            if (query.length > 1) {
+                fetch(`/autocomplete?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        currentSuggestions[platzId] = data;
+                        let suggestions = document.getElementById(`suggestions-${platzId}`);
+                        suggestions.innerHTML = '';
+
+                        if (data.length > 0) {
+                            data.forEach(item => {
+                                let option = document.createElement('div');
+                                option.classList.add('list-group-item');
+                                option.textContent = item;
+                                option.onclick = function() {
+                                    document.getElementById(platzId).value = item;
+                                    suggestions.innerHTML = '';
+                                    validSelections[platzId] = true;
+                                };
+                                suggestions.appendChild(option);
+                            });
+                        }
                     });
-                });
-        }
+            } else {
+                document.getElementById(`suggestions-${platzId}`).innerHTML = '';
+            }
+        });
     });
 
-    // Formulareinsendung verhindern, wenn kein gültiges Brettspiel ausgewählt wurde
     document.querySelector('form').addEventListener('submit', function(event) {
-        let inputValue = document.getElementById('Platz10').value;
+        let selectedGames = [];
 
-        // Überprüfen, ob die aktuelle Eingabe mit einem Vorschlag übereinstimmt
-        if (!validSelection && !currentSuggestions.includes(inputValue)) {
-            event.preventDefault();  // Formular nicht abschicken
-            alert("Bitte wähle ein Brettspiel aus der Liste aus!");
+        let invalidSelections = platzIds.some(function(platzId) {
+            let inputValue = document.getElementById(platzId).value.trim();
+            selectedGames.push(inputValue);
+            return !validSelections[platzId] && !currentSuggestions[platzId].includes(inputValue);
+        });
+
+        let duplicatesFound = selectedGames.some((game, index) => selectedGames.indexOf(game) !== index);
+
+        if (invalidSelections) {
+            event.preventDefault();
+            alert("Bitte wähle für jeden Platz ein Brettspiel aus der Liste aus!");
+        } else if (duplicatesFound) {
+            event.preventDefault();
+            alert("Bitte wähle für jeden Platz ein einzigartiges Brettspiel aus. Doppelte Einträge sind nicht erlaubt!");
         }
     });
 </script>
