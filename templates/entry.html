@@ -3,34 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datenbank</title>
+    <title>Datenbank - Goldener Berti 2024</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;  /* Heller Hintergrund */
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Breiterer Container */
+        .container {
+            margin-top: 50px;
+            max-width: 90%;  /* Breiterer Container */
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #343a40;
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .table thead {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f2f2f2;  /* Leichte Schattierung */
+        }
+
+        .table-striped tbody tr:hover {
+            background-color: #e9ecef;  /* Hover-Effekt */
+        }
+
+        th, td {
+            text-align: center;
+        }
+
+        /* Spezifische Spaltenbreiten */
+        .id-column {
+            width: 50px;
+        }
+
+        .date-column, .time-column {
+            width: 120px;
+        }
+
+        .email-column {
+            width: 220px;
+        }
+
+        .game-column {
+            width: 150px;  /* Spielspalten breiter gemacht */
+        }
+
+        /* Responsive Tabelle auf kleineren Geräten */
+        @media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">Antworten</h1>
-        <table class="table table-striped mt-4">
-            <thead>
-                <tr> <!-- DEFINIERT SPALTENNAMEN -->
-                    <th>ID</th>
-                    <th>Datum</th>
-                    <th>TimeStamp</th>
-                    <th>Email</th>
-                    <th>Platz 10</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in entries %}
-                <tr> <!-- DEFINIERT WAS ANGEZEIGT WIRD UND IN WELCHER REIHENFOLGE -->
-                    <td>{{ entry.id }}</td>
-                    <td>{{ entry.created_at.strftime('%d.%m.%Y') }}</td> <!-- Datum und Zeit formatieren -->
-                    <td>{{ entry.created_at.strftime('%H:%M') }}</td> <!-- Datum und Zeit formatieren -->
-                    <td>{{ entry.email }}</td>
-                    <td>{{ entry.Platz10 }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="container">
+        <h1>Antworten - Goldener Berti 2024</h1>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mt-4">
+                <thead>
+                    <tr>
+                        <th class="id-column">ID</th>
+                        <th class="date-column">Datum</th>
+                        <th class="time-column">TimeStamp</th>
+                        <th class="email-column">Email</th>
+                        <th class="game-column">Platz 10</th>
+                        <th class="game-column">Platz 9</th>
+                        <th class="game-column">Platz 8</th>
+                        <th class="game-column">Platz 7</th>
+                        <th class="game-column">Platz 6</th>
+                        <th class="game-column">Platz 5</th>
+                        <th class="game-column">Platz 4</th>
+                        <th class="game-column">Platz 3</th>
+                        <th class="game-column">Platz 2</th>
+                        <th class="game-column">Platz 1</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                    <tr>
+                        <td>{{ entry.id }}</td>
+                        <td>{{ entry.created_at.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ entry.created_at.strftime('%H:%M') }}</td>
+                        <td>{{ entry.email }}</td>
+                        <td>{{ entry.Platz10 }}</td>
+                        <td>{{ entry.Platz9 }}</td>
+                        <td>{{ entry.Platz8 }}</td>
+                        <td>{{ entry.Platz7 }}</td>
+                        <td>{{ entry.Platz6 }}</td>
+                        <td>{{ entry.Platz5 }}</td>
+                        <td>{{ entry.Platz4 }}</td>
+                        <td>{{ entry.Platz3 }}</td>
+                        <td>{{ entry.Platz2 }}</td>
+                        <td>{{ entry.Platz1 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    <!-- Bootstrap JS (Optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

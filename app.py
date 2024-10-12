@@ -244,10 +244,10 @@ def export_csv():
     si = StringIO()
     cw = csv.writer(si)
 
-    cw.writerow(['ID', 'Email', 'Brettspiel Platz 10'])
+    cw.writerow(['ID', 'Email', 'date', 'Brettspiel Platz 10','Brettspiel Platz 9','Brettspiel Platz 8','Brettspiel Platz 7','Brettspiel Platz 6','Brettspiel Platz 5','Brettspiel Platz 4','Brettspiel Platz 3','Brettspiel Platz 2','Brettspiel Platz 1'])
 
     for entry in all_entries:
-        cw.writerow([entry.id, entry.email, entry.Platz10])
+        cw.writerow([entry.id,  entry.email, entry.created_at, entry.Platz10,entry.Platz9,entry.Platz8,entry.Platz7,entry.Platz6,entry.Platz5,entry.Platz4,entry.Platz3,entry.Platz2,entry.Platz1])
 
     output = si.getvalue()
     si.close()

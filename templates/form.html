@@ -171,12 +171,18 @@
             </div>
         </form>
 
-        <div class="mt-4">
+        <!-- Container für die anderen Buttons -->
+        <div class="mt-4 d-flex justify-content-between">
+            <!-- Neuer Button für die Entries-Seite -->
+            <a href="/entries" class="btn btn-secondary">
+                <i class="fas fa-list"></i> Zu den Einträgen
+            </a>
+
+            <!-- CSV Export Button -->
             <a href="/export" class="btn btn-success">
-               <i class="fas fa-download"></i>
-                Datei export als CSV</a>
+                <i class="fas fa-download"></i> Datei export als CSV
+            </a>
         </div>
-    </div>
 
 <script>
     let validSelections = {};
