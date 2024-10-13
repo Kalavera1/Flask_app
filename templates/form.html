@@ -125,6 +125,7 @@
             transform: translateY(-10px);
             box-shadow: 0 16px 30px rgba(0, 0, 0, 0.3);
         }
+
     </style>
 </head>
 <body>
@@ -169,6 +170,7 @@
                   <i class="fas fa-paper-plane"></i> Speichern und Abschicken
                 </button>
             </div>
+
         </form>
 
         <!-- Container für die anderen Buttons -->
@@ -180,11 +182,13 @@
             </a>
 
             <!-- CSV Export Button -->
-            <a href="/export" class="btn btn-success">
+            <a href="/export" class="btn btn-success" id="exportButton">
                 <i class="fas fa-download"></i> Datei export als CSV
             </a>
         </div>
         {% endif %}
+
+    </div>
 
 <script>
     let validSelections = {};
@@ -261,7 +265,38 @@
             }, 1000);  // Entfernen nach der Animation
         }
     }, 1000);  // 1.0 Sekunde warten
-</script>
 
+    function highlightMatch(query, suggestion) {
+    const regex = new RegExp(`(${query})`, 'gi');
+    return suggestion.replace(regex, '<mark>$1</mark>');
+}
+
+platzIds.forEach(function(platzId) {
+    document.getElementById(platzId).addEventListener('input', function() {
+        let query = this.value.trim();
+        if (query.length > 1) {
+            fetch(`/autocomplete?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    let suggestions = document.getElementById(`suggestions-${platzId}`);
+                    suggestions.innerHTML = '';
+                    data.forEach(item => {
+                        let option = document.createElement('div');
+                        option.classList.add('list-group-item');
+                        option.innerHTML = highlightMatch(query, item);  // Hervorhebung
+                        option.onclick = function() {
+                            document.getElementById(platzId).value = item;
+                            suggestions.innerHTML = '';
+                        };
+                        suggestions.appendChild(option);
+                    });
+                });
+        } else {
+            document.getElementById(`suggestions-${platzId}`).innerHTML = '';
+        }
+    });
+});
+
+</script>
 </body>
 </html>
