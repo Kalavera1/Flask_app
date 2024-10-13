@@ -172,6 +172,7 @@
         </form>
 
         <!-- Container für die anderen Buttons -->
+        {% if current_user.role == 'Admin' %}
         <div class="mt-4 d-flex justify-content-between">
             <!-- Neuer Button für die Entries-Seite -->
             <a href="/entries" class="btn btn-secondary">
@@ -183,6 +184,7 @@
                 <i class="fas fa-download"></i> Datei export als CSV
             </a>
         </div>
+        {% endif %}
 
 <script>
     let validSelections = {};

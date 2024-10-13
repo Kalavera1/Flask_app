@@ -6,12 +6,12 @@ from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
-from email_validator import validate_email
 from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Mail, Message
 from functools import wraps
 from dotenv import load_dotenv
+from xml.etree import ElementTree as ET
 
 # Erstelle die Flask App-Instanz
 app = Flask(__name__)
@@ -270,7 +270,6 @@ def autocomplete():
     query = request.args.get('query')
     if not query:
         return jsonify([])
-
     try:
         with open('static/brettspiele.txt', 'r', encoding='utf-8') as f:
             brettspiele = [line.strip() for line in f.readlines()]
