@@ -17,9 +17,10 @@ from dotenv import load_dotenv
 app = Flask(__name__)
 
 # Mail-Konfiguration
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_SERVER'] = 'mail.gmx.net'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
 # aus .env datei, die nicht auf Git hochgeladen wird
 load_dotenv()
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
@@ -204,7 +205,7 @@ def form():
         if send_email:
             subject = "Bestätigung: Teilnahme am Goldenen Berti 2024"
             body = f"""
-            Hallo {name},
+            Hallo ,
 
             Vielen Dank für deine Teilnahme am Goldenen Berti 2024!
 
