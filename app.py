@@ -10,6 +10,7 @@ from email_validator import validate_email
 from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Mail, Message
+from functools import wraps
 
 # Erstelle die Flask App-Instanz
 app = Flask(__name__)
@@ -40,6 +41,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
+    role = db.Column(db.String(50), nullable=False, default='User')  # Neue Spalte für die Rolle User
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 # Datenbankmodell für Einträge erstellen. Diese werden dann später aufgerufen.
@@ -75,13 +77,17 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
 
-# Route für Registrierung
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=8)
-        new_user = User(email=form.email.data, password=hashed_password)
+        # Prüfen, ob der Benutzer ein Admin ist
+        if form.email.data == 'l.henkes@gmx.de':  # Deine E-Mail-Adresse hier einfügen
+            role = 'Admin'
+        else:
+            role = 'User'
+        new_user = User(email=form.email.data, password=hashed_password, role=role)
         db.session.add(new_user)
         db.session.commit()
         flash("Registrierung erfolgreich! Bitte melde dich an.")
@@ -107,12 +113,34 @@ def login():
             flash("Login fehlgeschlagen. Bitte überprüfe deine Email und dein Passwort.")
     return render_template('login.html', form=form)
 
+
+# Dekorator für Admin-Berechtigungen. Sonst kennt er unten nicht @admin_required
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.role != 'Admin':  # Überprüfen, ob der Benutzer ein Admin ist
+            abort(403)  # HTTP 403: Zugriff verweigert
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/admin/manage_users')
+@login_required
+@admin_required  # Nur Admins dürfen auf diese Seite zugreifen
+def manage_users():
+    users = User.query.all()  # Holen aller Benutzer aus der Datenbank
+    return render_template('manage_users.html', users=users)
+
 # Route zum Abmelden
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
+
+# Fehlerbehandlung für 403 - Zugriff verweigert
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('403.html'), 403
 
 # Route für das Eintragsformular, nur für angemeldete Benutzer
 @app.route('/form', methods=['GET', 'POST'])
@@ -238,6 +266,8 @@ def thankyou():
     return render_template('thankyou.html')
 
 @app.route('/export')
+@login_required
+@admin_required
 def export_csv():
     all_entries = Entry.query.all()
 
