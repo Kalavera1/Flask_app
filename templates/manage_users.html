@@ -15,6 +15,7 @@
                     <th>ID</th>
                     <th>Email</th>
                     <th>Rolle</th>
+                    <th>Letzter Login</th>
                 </tr>
             </thead>
             <tbody>
@@ -22,7 +23,20 @@
                 <tr>
                     <td>{{ user.id }}</td>
                     <td>{{ user.email }}</td>
-                    <td>{{ user.role }}</td>
+                    <!-- Dropdown-Menü für die Rollen -->
+                    <td>
+                        <form action="{{ url_for('update_user_role', user_id=user.id) }}" method="POST">
+                            <select name="role" class="form-select" onchange="this.form.submit()">
+                                <option value="User" {% if user.role == 'User' %}selected{% endif %}>Benutzer</option>
+                                <option value="Admin" {% if user.role == 'Admin' %}selected{% endif %}>Admin</option>
+                            </select>
+                        </form>
+                    </td>
+                    <!-- Anzeige des letzten Logins -->
+                    <td>{{ user.last_login.strftime('%d.%m.%Y %H:%M:%S') if user.last_login else 'Noch kein Login' }}</td>
+                    <td>
+                    <!-- Optional: Hier kannst du weitere Aktionen wie Benutzer löschen hinzufügen -->
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

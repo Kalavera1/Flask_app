@@ -22,6 +22,7 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 # aus .env datei, die nicht auf Git hochgeladen wird
+
 load_dotenv()
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
@@ -45,7 +46,8 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
-    role = db.Column(db.String(50), nullable=False, default='User')  # Neue Spalte für die Rolle User
+    role = db.Column(db.String(50), nullable=False, default='User')  # Rolle hinzufügen
+    last_login = db.Column(db.DateTime, nullable=True)  # Neues Feld für den letzten Login
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 # Datenbankmodell für Einträge erstellen. Diese werden dann später aufgerufen.
@@ -86,11 +88,12 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=8)
-        # Prüfen, ob der Benutzer ein Admin ist
-        if form.email.data == 'l.henkes@gmx.de':  # Deine E-Mail-Adresse hier einfügen
+
+        if form.email.data == 'l.henkes@gmx.de':
             role = 'Admin'
         else:
             role = 'User'
+
         new_user = User(email=form.email.data, password=hashed_password, role=role)
         db.session.add(new_user)
         db.session.commit()
@@ -112,27 +115,42 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
+            user.last_login = datetime.utcnow()  # Letzter Login wird gesetzt
+            db.session.commit()  # Speichert den neuen Wert
             return redirect(url_for('form'))
         else:
             flash("Login fehlgeschlagen. Bitte überprüfe deine Email und dein Passwort.")
     return render_template('login.html', form=form)
 
-
 # Dekorator für Admin-Berechtigungen. Sonst kennt er unten nicht @admin_required
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if current_user.role != 'Admin':  # Überprüfen, ob der Benutzer ein Admin ist
-            abort(403)  # HTTP 403: Zugriff verweigert
+        if current_user.role != 'Admin':  # Überprüfen, ob der Benutzer Admin ist
+            abort(403)  # Zugriff verweigert
         return f(*args, **kwargs)
     return decorated_function
 
 @app.route('/admin/manage_users')
 @login_required
-@admin_required  # Nur Admins dürfen auf diese Seite zugreifen
+@admin_required  # Nur Admins haben Zugriff
 def manage_users():
-    users = User.query.all()  # Holen aller Benutzer aus der Datenbank
+    users = User.query.all()
     return render_template('manage_users.html', users=users)
+
+@app.route('/admin/update_role/<int:user_id>', methods=['POST'])
+@login_required
+@admin_required
+def update_user_role(user_id):
+    user = User.query.get_or_404(user_id)
+    new_role = request.form.get('role')
+
+    if new_role in ['User', 'Admin'] and new_role != user.role:
+        user.role = new_role
+        db.session.commit()
+        flash(f'Rolle von {user.email} erfolgreich auf {new_role} geändert!', 'success')
+
+    return redirect(url_for('manage_users'))
 
 # Route zum Abmelden
 @app.route('/logout')
@@ -205,7 +223,7 @@ def form():
         if send_email:
             subject = "Bestätigung: Teilnahme am Goldenen Berti 2024"
             body = f"""
-            Hallo ,
+            Hallo Freund,
 
             Vielen Dank für deine Teilnahme am Goldenen Berti 2024!
 
@@ -228,7 +246,7 @@ def form():
             Das Team vom Goldenen Berti
             """
 
-            msg = Message(subject, recipients=[email])
+            msg = Message(subject, recipients=[email], sender=app.config['MAIL_USERNAME'])
             msg.body = body
             mail.send(msg)
 
